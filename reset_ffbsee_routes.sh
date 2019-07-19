@@ -2,7 +2,7 @@
 
 # -----
 # title           :reset_ffbsee_routes.sh
-# description     :reset the routes for a router or devide with an interface to ffbsee
+# description     :reset the routes for a router or device with an interface to ffbsee
 # author          :Jonas aka Wolf
 # version         :0.1
 # usage           :reset_ffbsee_routes.sh
@@ -27,7 +27,7 @@ default=0
 # ethdev is the ethernetdevice with connection to ffbsee
 ethdev='eth1'
 
-# ipv4 ffbsee gateway
+# ips of ffbsee gateway
 ipv4gw='10.15.224.1'
 ipv6gw='fdef:1701:b5ee:23::1'
 
@@ -86,25 +86,24 @@ fi
 ip -6 addr add $ipv6_linklocal/64 dev $ethdev
 ip -6 addr add $ipv6_ffbsee/64 dev $ethdev
 
-# let me set a default route on
-ip route del fdef:1701:b5ee::/48
-ip route add fdef:1701:b5ee::/48 dev $ethdev
-
-# ipv4-to-ffbsee
+# routes to ffbsee
 ip route del 10.11.160.0/20
 ip route add 10.11.160.0/20 dev $ethdev
 ip route del 10.15.224.0/20
 ip route add 10.15.224.0/20 dev $ethdev
+ip route del fdef:1701:b5ee::/48
+ip route add fdef:1701:b5ee::/48 dev $ethdev
+
+# routes to ff3l
+ip route del 10.119.0.0/16
+ip route add 10.119.0.0/16 via $ipv4gw dev $ethdev
+route -A inet6 add fdc7:3c9d:b889:a272::/64 gw $ipv6gw
 
 # dn42
 route -A inet6 del fd00::/8
 route -A inet6 add fd00::/8 gw $ipv6gw dev $ethdev
 ip route del 172.20.0.0/14
 ip route add 172.20.0.0/14 via $ipv4gw dev $ethdev
-
-# ipv4 ff3l
-ip route del 10.119.0.0/16
-ip route add 10.119.0.0/16 via $ipv4gw dev $ethdev
 
 if [[ $default == 1 ]]; then
 ## default route feature v6
