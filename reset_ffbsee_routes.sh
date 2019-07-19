@@ -44,16 +44,19 @@ case $key in
     ;;
     --gw4)
     ipv4gw="$2"
+    echo "- Custom IPv4 Gateway set: $ipv4gw"
     shift # past argument
     shift # past value
     ;;
     --gw6)
     ipv6gw="$2"
+    echo "- Custom IPv6 Gateway set: $ipv6gw"
     shift # past argument
     shift # past value
     ;;
     --default)
     default=1
+    echo "- Default-Route-Mode activated."
     shift # past argument
     shift # past value
     ;;
@@ -91,12 +94,13 @@ ip route del 10.11.160.0/20
 ip route add 10.11.160.0/20 dev $ethdev
 ip route del 10.15.224.0/20
 ip route add 10.15.224.0/20 dev $ethdev
-ip route del fdef:1701:b5ee::/48
-ip route add fdef:1701:b5ee::/48 dev $ethdev
+route -A inet6 del fdef:1701:b5ee::/48
+route -A inet6 add fdef:1701:b5ee::/48 dev $ethdev
 
 # routes to ff3l
 ip route del 10.119.0.0/16
 ip route add 10.119.0.0/16 via $ipv4gw dev $ethdev
+route -A inet6 del fdc7:3c9d:b889:a272::/64
 route -A inet6 add fdc7:3c9d:b889:a272::/64 gw $ipv6gw
 
 # dn42
@@ -106,10 +110,13 @@ ip route del 172.20.0.0/14
 ip route add 172.20.0.0/14 via $ipv4gw dev $ethdev
 
 if [[ $default == 1 ]]; then
+
 ## default route feature v6
-ip route del ::/0
-ip route add ::/0 via $ipv6gw dev $ethdev
+route -A inet6 del ::/0
+route -A inet6 add ::/0 gw $ipv6gw dev $ethdev
+
 ## default route feature v4
 ip route delete default
 ip route add default via $ipv4gw dev $ethdev
+
 fi
