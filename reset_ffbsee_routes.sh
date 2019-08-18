@@ -29,7 +29,9 @@ ethdev='eth1'
 
 # ips of ffbsee gateway
 ipv4gw='10.15.224.1'
+ipv4gw2='10.15.224.4'
 ipv6gw='fdef:1701:b5ee:23::1'
+ipv6gw2='fdef:1701:b5ee:23::4'
 
 # get arguments
 while [[ $# -gt 0 ]]
@@ -79,6 +81,32 @@ ipv6_ffbsee="fdef:1701:b5ee:23:$ipv6_suffix"
 echo "- MAC: $mac"
 echo "- IPv6-Link-Local: $ipv6_linklocal"
 echo "- IPv6-FFBSEE-Suggestion: $ipv6_ffbsee"
+
+if ping -c 1 $ipv4gw &> /dev/null
+then
+  echo "- IPv4GW $ipv4gw reachable"
+else
+  echo "- IPv4GW $ipv4gw not reachable"
+  echo "- trying alternative ..."
+  ipv4gw=$ipv4gw2
+  if ping -c 1 $ipv4gw &> /dev/null
+  then
+    echo "- IPv4GW $ipv4gw reachable"
+  fi
+fi
+
+if ping -c 1 $ipv6gw &> /dev/null
+then
+  echo "- IPv6 Gateway $ipv6gw reachable"
+else
+  echo "- IPv6 Gateway $ipv6gw not reachable"
+  echo "- trying alternative ..."
+  ipv6gw=$ipv6gw2
+  if ping -c 1 $ipv6gw &> /dev/null
+  then
+    echo "- IPv6 Gateway $ipv6gw reachable"
+  fi
+fi
 
 if [[ $dryrun == 1 ]]; then
   echo '- Was just a dry-run I will not set any routes.'
